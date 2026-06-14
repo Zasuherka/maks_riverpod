@@ -117,7 +117,7 @@ class ProductCard extends ConsumerWidget {
 
 class _FavoriteIcon extends StatelessWidget {
   final bool isFavorite;
-  const _FavoriteIcon({super.key, required this.isFavorite});
+  const _FavoriteIcon({required this.isFavorite});
 
   @override
   Widget build(BuildContext context) {

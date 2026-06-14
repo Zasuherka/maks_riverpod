@@ -18,7 +18,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:maks_riverpod/domain/models/cart_item.dart';
 import 'package:maks_riverpod/domain/models/product.dart';
 import 'package:maks_riverpod/presentation/providers/cart_provider.dart';
-import 'package:maks_riverpod/widgets/product_card.dart';
+import 'package:maks_riverpod/presentation/widgets/product_card.dart';
 
 // Тестовый продукт — используется во всех тестах
 const _testProduct = Product(
