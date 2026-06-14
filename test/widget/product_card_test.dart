@@ -15,10 +15,28 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:maks_riverpod/data/repositories/favorite_repository_impl.dart';
 import 'package:maks_riverpod/domain/models/cart_item.dart';
 import 'package:maks_riverpod/domain/models/product.dart';
+import 'package:maks_riverpod/domain/repositories/favorite_repository.dart';
 import 'package:maks_riverpod/presentation/providers/cart_provider.dart';
 import 'package:maks_riverpod/presentation/widgets/product_card.dart';
+
+// Фейковый репозиторий без задержек — нужен для widget-тестов.
+// ProductCard использует favoriteProductsProvider, который внутри вызывает
+// FavoriteRepositoryImpl с Future.delayed(1 second). В тестовом fake async
+// окружении это создаёт "pending timer" и роняет тест.
+// Решение: подменяем репозиторий через override на реализацию без задержек.
+class _FakeFavoriteRepository implements FavoriteRepository {
+  @override
+  Future<List<String>> getFavoritesProduct() async => [];
+
+  @override
+  Future<void> addToFavorite(String id) async {}
+
+  @override
+  Future<void> removeToFavorite(String id) async {}
+}
 
 // Тестовый продукт — используется во всех тестах
 const _testProduct = Product(
@@ -39,8 +57,11 @@ const _testProduct = Product(
 //   - MaterialApp: нужен для Theme, Navigator и т.д.
 //   - Scaffold: нужен для корректного рендера Material-виджетов
 Widget buildTestApp() {
-  return const ProviderScope(
-    child: MaterialApp(
+  return ProviderScope(
+    overrides: [
+      favoriteRepositoryProvider.overrideWithValue(_FakeFavoriteRepository()),
+    ],
+    child: const MaterialApp(
       home: Scaffold(
         body: Center(
           // Задаём размер карточки — иначе она может быть unconstrained
@@ -64,6 +85,7 @@ Widget buildTestApp() {
 Widget buildTestAppWithCart(Cart Function() cartFactory) {
   return ProviderScope(
     overrides: [
+      favoriteRepositoryProvider.overrideWithValue(_FakeFavoriteRepository()),
       // overrideWith() говорит Riverpod:
       // "вместо обычного Cart() используй cartFactory() при создании cartProvider"
       cartProvider.overrideWith(cartFactory),
