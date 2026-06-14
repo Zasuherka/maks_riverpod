@@ -25,7 +25,6 @@ class _CartScreenState extends ConsumerState<CartScreen> {
   Widget build(BuildContext context) {
     final cart = ref.watch(cartProvider);
     final total = ref.watch(cartTotalProvider);
-
     // ==========================================================================
     // ДЕМО: ref.listen() — реакция на изменения провайдера БЕЗ перестройки UI
     // ==========================================================================
