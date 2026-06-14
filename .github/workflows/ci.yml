@@ -1,0 +1,67 @@
+name: CI — Analyze & Test
+
+# Триггеры: когда запускается этот воркфлоу
+on:
+  push:
+    branches: [main]        # при любом пуше в main
+  pull_request:
+    branches: [main]        # при создании/обновлении PR в main
+  workflow_dispatch:        # кнопка ручного запуска в интерфейсе GitHub
+
+jobs:
+  analyze-and-test:
+    name: Analyze & Test
+    runs-on: ubuntu-latest  # виртуальная машина на Ubuntu
+
+    steps:
+      # Шаг 1: Скачиваем код репозитория на виртуальную машину GitHub
+      # Без этого шага runner не знает о нашем коде
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Шаг 2: Устанавливаем Flutter нужной версии
+      # cache: true — кэшируем SDK между запусками, чтобы не скачивать каждый раз
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.38.9'
+          channel: 'stable'
+          cache: true
+
+      # Шаг 3: Устанавливаем зависимости из pubspec.yaml
+      # Аналог того, что мы делаем локально перед запуском проекта
+      - name: Install dependencies
+        run: flutter pub get
+
+      # Шаг 4: Генерация кода через build_runner
+      # Создаёт .g.dart файлы из @riverpod аннотаций и @GenerateMocks
+      # --delete-conflicting-outputs — пересоздаёт файлы, если они устарели
+      - name: Generate code
+        run: dart run build_runner build --delete-conflicting-outputs
+
+      # Шаг 5: Проверка форматирования
+      # Убеждаемся, что код отформатирован по стандарту Dart
+      # --set-exit-if-changed — завалит шаг, если что-то не отформатировано
+      - name: Check formatting
+        run: dart format --output=none --set-exit-if-changed lib/ test/
+
+      # Шаг 6: Статический анализ кода
+      # flutter analyze ищет ошибки типов, предупреждения линтера, deprecated API
+      # Без этого шага можно случайно замержить код с очевидными ошибками
+      - name: Analyze
+        run: flutter analyze --fatal-infos
+
+      # Шаг 7: Запускаем тесты и собираем coverage
+      # --coverage — создаёт папку coverage/lcov.info с отчётом покрытия
+      - name: Run tests
+        run: flutter test --coverage
+
+      # Шаг 8: Загружаем отчёт покрытия как артефакт
+      # Артефакт можно скачать из интерфейса GitHub после прогона
+      # retention-days: 7 — хранится 7 дней, потом удаляется автоматически
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage/
+          retention-days: 7

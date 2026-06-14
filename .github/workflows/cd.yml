@@ -1,0 +1,138 @@
+name: CD — Build Release APK
+
+on:
+  push:
+    branches: [main]        # запускается при каждом мерже в main
+  workflow_dispatch:        # можно запустить вручную с параметрами
+    inputs:
+      version:
+        description: 'Версия сборки (например: 1.0.1)'
+        required: false
+        default: ''
+
+# Разрешаем воркфлоу читать содержимое репозитория
+permissions:
+  contents: read
+
+jobs:
+  # ─── Шаг A: Сначала прогоняем CI ───────────────────────────────────────────
+  # Смысл: не хотим собирать APK из сломанного кода
+  # Если CI упал — CD даже не запустится, сэкономим минуты и не получим плохой билд
+  ci:
+    name: Run CI checks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.38.9'
+          channel: 'stable'
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Generate code
+        run: dart run build_runner build --delete-conflicting-outputs
+
+      - name: Check formatting
+        run: dart format --output=none --set-exit-if-changed lib/ test/
+
+      - name: Analyze
+        run: flutter analyze --fatal-infos
+
+      - name: Run tests
+        run: flutter test
+
+  # ─── Шаг B: Сборка Release APK ──────────────────────────────────────────────
+  # needs: [ci] — этот джоб запустится ТОЛЬКО если джоб ci выше прошёл успешно
+  build-apk:
+    name: Build Release APK
+    runs-on: ubuntu-latest
+    needs: [ci]             # зависимость от CI — главный механизм контроля качества
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.38.9'
+          channel: 'stable'
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Generate code
+        run: dart run build_runner build --delete-conflicting-outputs
+
+      # Декодируем keystore из Base64
+      # KEYSTORE_BASE64 — это наш .jks файл, закодированный в Base64 и сохранённый в GitHub Secrets
+      # Мы не можем хранить бинарные файлы в секретах напрямую — только строки
+      # Поэтому кодируем файл → строка в Secrets → декодируем обратно в файл на CI
+      - name: Decode keystore
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/app/upload-keystore.jks
+
+      # Создаём key.properties из GitHub Secrets
+      # Этот файл нужен build.gradle.kts для подписи APK
+      # Все чувствительные данные приходят из Secrets — не из кода
+      - name: Create key.properties
+        run: |
+          cat > android/key.properties << EOF
+          storePassword=${{ secrets.KEYSTORE_PASSWORD }}
+          keyPassword=${{ secrets.KEY_PASSWORD }}
+          keyAlias=${{ secrets.KEY_ALIAS }}
+          storeFile=app/upload-keystore.jks
+          EOF
+
+      # Устанавливаем версию, если она передана вручную через workflow_dispatch
+      # Если версия не передана — используем ту, что уже стоит в pubspec.yaml
+      - name: Set version
+        if: ${{ github.event.inputs.version != '' }}
+        run: |
+          VERSION="${{ github.event.inputs.version }}"
+          BUILD_NUMBER="${{ github.run_number }}"
+          sed -i "s/^version:.*/version: ${VERSION}+${BUILD_NUMBER}/" pubspec.yaml
+
+      # Собираем release APK
+      # --release — включает оптимизации, обфускацию (ProGuard), подпись keystore
+      # --obfuscate и --split-debug-info — скрывают имена классов от реверс-инжиниринга
+      - name: Build Release APK
+        run: |
+          flutter build apk \
+            --release \
+            --obfuscate \
+            --split-debug-info=build/debug-info
+
+      # Переименовываем APK с номером сборки, чтобы различать билды
+      # github.run_number — автоматический инкрементальный номер запуска
+      - name: Rename APK
+        run: |
+          mv build/app/outputs/flutter-apk/app-release.apk \
+             build/app/outputs/flutter-apk/maks_riverpod-release-${{ github.run_number }}.apk
+
+      # Загружаем APK как артефакт GitHub
+      # После завершения пайплайна его можно скачать в разделе Actions → Summary
+      # retention-days: 30 — хранится 30 дней
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: maks_riverpod-release-${{ github.run_number }}
+          path: build/app/outputs/flutter-apk/maks_riverpod-release-${{ github.run_number }}.apk
+          retention-days: 30
+
+      # Загружаем debug symbols — нужны для расшифровки стек-трейсов из crash-репортов
+      # Если приложение упадёт у пользователя, без этих символов лог будет нечитаем
+      - name: Upload debug symbols
+        uses: actions/upload-artifact@v4
+        with:
+          name: debug-info-${{ github.run_number }}
+          path: build/debug-info/
+          retention-days: 30
