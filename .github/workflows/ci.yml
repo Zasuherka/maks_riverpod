@@ -8,6 +8,11 @@ on:
     branches: [main]        # при создании/обновлении PR в main
   workflow_dispatch:        # кнопка ручного запуска в интерфейсе GitHub
 
+# Принудительно используем Node.js 24 для всех actions в этом воркфлоу
+# Node.js 20 объявлен deprecated и будет удалён с раннеров 16 сентября 2026
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   analyze-and-test:
     name: Analyze & Test
