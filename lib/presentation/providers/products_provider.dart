@@ -8,18 +8,90 @@ part 'products_provider.g.dart';
 
 // Моковые данные — имитируем ответ сервера
 const _mockProducts = [
-  Product(id: '1', name: 'Молоко', category: 'Молочное', price: 89.90, emoji: '🥛'),
-  Product(id: '2', name: 'Кефир', category: 'Молочное', price: 65.50, emoji: '🍶'),
-  Product(id: '3', name: 'Сыр', category: 'Молочное', price: 320.00, emoji: '🧀'),
-  Product(id: '4', name: 'Хлеб', category: 'Выпечка', price: 45.00, emoji: '🍞'),
-  Product(id: '5', name: 'Батон', category: 'Выпечка', price: 38.00, emoji: '🥖'),
-  Product(id: '6', name: 'Яблоки', category: 'Фрукты', price: 120.00, emoji: '🍎'),
-  Product(id: '7', name: 'Бананы', category: 'Фрукты', price: 95.00, emoji: '🍌'),
-  Product(id: '8', name: 'Апельсины', category: 'Фрукты', price: 145.00, emoji: '🍊'),
-  Product(id: '9', name: 'Куриная грудка', category: 'Мясо', price: 380.00, emoji: '🍗'),
-  Product(id: '10', name: 'Говядина', category: 'Мясо', price: 520.00, emoji: '🥩'),
-  Product(id: '11', name: 'Яйца', category: 'Прочее', price: 110.00, emoji: '🥚'),
-  Product(id: '12', name: 'Масло', category: 'Прочее', price: 195.00, emoji: '🧈'),
+  Product(
+    id: '1',
+    name: 'Молоко',
+    category: 'Молочное',
+    price: 89.90,
+    emoji: '🥛',
+  ),
+  Product(
+    id: '2',
+    name: 'Кефир',
+    category: 'Молочное',
+    price: 65.50,
+    emoji: '🍶',
+  ),
+  Product(
+    id: '3',
+    name: 'Сыр',
+    category: 'Молочное',
+    price: 320.00,
+    emoji: '🧀',
+  ),
+  Product(
+    id: '4',
+    name: 'Хлеб',
+    category: 'Выпечка',
+    price: 45.00,
+    emoji: '🍞',
+  ),
+  Product(
+    id: '5',
+    name: 'Батон',
+    category: 'Выпечка',
+    price: 38.00,
+    emoji: '🥖',
+  ),
+  Product(
+    id: '6',
+    name: 'Яблоки',
+    category: 'Фрукты',
+    price: 120.00,
+    emoji: '🍎',
+  ),
+  Product(
+    id: '7',
+    name: 'Бананы',
+    category: 'Фрукты',
+    price: 95.00,
+    emoji: '🍌',
+  ),
+  Product(
+    id: '8',
+    name: 'Апельсины',
+    category: 'Фрукты',
+    price: 145.00,
+    emoji: '🍊',
+  ),
+  Product(
+    id: '9',
+    name: 'Куриная грудка',
+    category: 'Мясо',
+    price: 380.00,
+    emoji: '🍗',
+  ),
+  Product(
+    id: '10',
+    name: 'Говядина',
+    category: 'Мясо',
+    price: 520.00,
+    emoji: '🥩',
+  ),
+  Product(
+    id: '11',
+    name: 'Яйца',
+    category: 'Прочее',
+    price: 110.00,
+    emoji: '🥚',
+  ),
+  Product(
+    id: '12',
+    name: 'Масло',
+    category: 'Прочее',
+    price: 195.00,
+    emoji: '🧈',
+  ),
 ];
 
 // =============================================================================
@@ -77,17 +149,19 @@ Future<List<Product>> filteredProducts(Ref ref) async {
   final searchQuery = ref.watch(searchQueryProvider);
 
   late final List<Product> productList;
-  if (selectedCategory == null){
+  if (selectedCategory == null) {
     productList = allProducts;
-  } else{
-    productList = allProducts.where((p) => p.category == selectedCategory).toList();
+  } else {
+    productList = allProducts
+        .where((p) => p.category == selectedCategory)
+        .toList();
   }
-  if(searchQuery.isEmpty){
+  if (searchQuery.isEmpty) {
     return productList;
-  } else{
-    return productList.where(
-      (product) => product.name.toLowerCase().contains(searchQuery),
-    ).toList();
+  } else {
+    return productList
+        .where((product) => product.name.toLowerCase().contains(searchQuery))
+        .toList();
   }
 }
 

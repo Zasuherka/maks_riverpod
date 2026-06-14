@@ -5,9 +5,9 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'favorite_products_provider.g.dart';
 
 @Riverpod(keepAlive: true)
-class FavoriteProducts extends _$FavoriteProducts{
+class FavoriteProducts extends _$FavoriteProducts {
   @override
-  Future<List<String>> build() async{
+  Future<List<String>> build() async {
     final repo = ref.watch(favoriteRepositoryProvider);
     ref.watch(authProvider);
     return await repo.getFavoritesProduct();
@@ -24,26 +24,26 @@ class FavoriteProducts extends _$FavoriteProducts{
 }
 
 @riverpod
-class IsFavoriteProduct extends _$IsFavoriteProduct{
+class IsFavoriteProduct extends _$IsFavoriteProduct {
   @override
-  Future<bool> build(String productId) async{
+  Future<bool> build(String productId) async {
     return await _getValue();
   }
 
-  Future<bool> _getValue() async{
+  Future<bool> _getValue() async {
     final products = await ref.read(favoriteProductsProvider.future);
     return products.contains(productId);
   }
 
-  Future<void> editFavorite(String productId) async{
+  Future<void> editFavorite(String productId) async {
     final isFavorite = state.value ?? false;
     final repo = ref.read(favoriteRepositoryProvider);
     state = const AsyncValue.loading();
     try {
-      if(isFavorite){
+      if (isFavorite) {
         await repo.removeToFavorite(productId);
         ref.read(favoriteProductsProvider.notifier).removeProduct(productId);
-      } else{
+      } else {
         await repo.addToFavorite(productId);
         ref.read(favoriteProductsProvider.notifier).addProduct(productId);
       }

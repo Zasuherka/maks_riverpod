@@ -32,10 +32,8 @@ class OrderScreen extends ConsumerWidget {
         child: statusAsync.when(
           loading: () => const Center(child: CircularProgressIndicator()),
           error: (e, _) => Center(child: Text('Ошибка: $e')),
-          data: (currentStatus) => _OrderTimeline(
-            currentStatus: currentStatus,
-            orderId: orderId,
-          ),
+          data: (currentStatus) =>
+              _OrderTimeline(currentStatus: currentStatus, orderId: orderId),
         ),
       ),
     );
@@ -43,10 +41,7 @@ class OrderScreen extends ConsumerWidget {
 }
 
 class _OrderTimeline extends ConsumerWidget {
-  const _OrderTimeline({
-    required this.currentStatus,
-    required this.orderId,
-  });
+  const _OrderTimeline({required this.currentStatus, required this.orderId});
 
   final OrderStatus currentStatus;
   final String orderId;
@@ -107,13 +102,11 @@ class _OrderTimeline extends ConsumerWidget {
                 Text(
                   status.label,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: isCurrent
-                            ? FontWeight.bold
-                            : FontWeight.normal,
-                        color: isPassed
-                            ? Theme.of(context).colorScheme.primary
-                            : Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
+                    fontWeight: isCurrent ? FontWeight.bold : FontWeight.normal,
+                    color: isPassed
+                        ? Theme.of(context).colorScheme.primary
+                        : Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
                 ),
               ],
             ),
@@ -126,9 +119,9 @@ class _OrderTimeline extends ConsumerWidget {
           Text(
             '${OrderStatus.ready.emoji} Ваш заказ готов!',
             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  color: Theme.of(context).colorScheme.primary,
-                  fontWeight: FontWeight.bold,
-                ),
+              color: Theme.of(context).colorScheme.primary,
+              fontWeight: FontWeight.bold,
+            ),
           ),
           const SizedBox(height: 24),
           FilledButton(

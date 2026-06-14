@@ -116,8 +116,7 @@ final routerProvider = Provider<GoRouter>((ref) {
                         name: 'order',
                         builder: (context, state) {
                           // Извлекаем параметр из пути
-                          final orderId =
-                              state.pathParameters['orderId'] ?? '';
+                          final orderId = state.pathParameters['orderId'] ?? '';
                           return OrderScreen(orderId: orderId);
                         },
                       ),
@@ -179,6 +178,8 @@ class _AppRouterObserver extends NavigatorObserver {
 
   @override
   void didReplace({Route? newRoute, Route? oldRoute}) {
-    debugPrint('[Router] replace: ${oldRoute?.settings.name} → ${newRoute?.settings.name}');
+    debugPrint(
+      '[Router] replace: ${oldRoute?.settings.name} → ${newRoute?.settings.name}',
+    );
   }
 }

@@ -5,9 +5,7 @@ import 'package:maks_riverpod/router/app_router.dart';
 void main() {
   runApp(
     // ProviderScope обязателен — создаёт контейнер для всех Riverpod провайдеров
-    const ProviderScope(
-      child: ShopApp(),
-    ),
+    const ProviderScope(child: ShopApp()),
   );
 }
 

@@ -20,17 +20,17 @@ class HomeScreen extends ConsumerWidget {
     // ref.watch() — подписываемся на количество товаров в корзине.
     // Виджет перестроится только когда изменится cartItemCount.
     final itemCount = ref.watch(cartItemCountProvider);
-    ref.listen(cartItemCountProvider, (previous, next){
-      if(next > (previous ?? 0)){
+    ref.listen(cartItemCountProvider, (previous, next) {
+      if (next > (previous ?? 0)) {
         ScaffoldMessenger.of(context).clearSnackBars();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Товар добавлен в корзину')),
-        );
-      } else if(next < (previous ?? 0)){
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Товар добавлен в корзину')));
+      } else if (next < (previous ?? 0)) {
         ScaffoldMessenger.of(context).clearSnackBars();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Товар удалён из корзины')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Товар удалён из корзины')));
       }
     });
 
@@ -116,9 +116,9 @@ class _SearchBarState extends ConsumerState<_SearchBar> {
     return Padding(
       padding: const EdgeInsets.fromLTRB(12, 12, 12, 4),
       child: TextField(
-        onChanged: (text){
+        onChanged: (text) {
           _searchTimer?.cancel();
-          _searchTimer = Timer(const Duration(milliseconds: 500), (){
+          _searchTimer = Timer(const Duration(milliseconds: 500), () {
             ref.read(searchQueryProvider.notifier).search(text);
           });
         },
@@ -205,8 +205,7 @@ class _CategoryChip extends StatelessWidget {
               ? Theme.of(context).colorScheme.primaryContainer
               : null,
           labelStyle: TextStyle(
-            fontWeight:
-                isSelected ? FontWeight.bold : FontWeight.normal,
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
             color: isSelected
                 ? Theme.of(context).colorScheme.onPrimaryContainer
                 : null,

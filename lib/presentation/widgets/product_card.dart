@@ -74,14 +74,15 @@ class ProductCard extends ConsumerWidget {
                         ),
                 ),
                 GestureDetector(
-                  onTap: (){
-                    ref.read(isFavoriteProductProvider(product.id).notifier)
+                  onTap: () {
+                    ref
+                        .read(isFavoriteProductProvider(product.id).notifier)
                         .editFavorite(product.id);
                   },
                   child: DecoratedBox(
                     decoration: BoxDecoration(
                       color: Colors.red,
-                      shape: .circle
+                      shape: .circle,
                     ),
                     child: SizedBox(
                       height: 40,
@@ -89,13 +90,15 @@ class ProductCard extends ConsumerWidget {
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: isFavoriteAsync.map(
-                          error: (error){
-                            return _FavoriteIcon(isFavorite: error.value ?? false);
+                          error: (error) {
+                            return _FavoriteIcon(
+                              isFavorite: error.value ?? false,
+                            );
                           },
-                          loading: (loading){
+                          loading: (loading) {
                             return CircularProgressIndicator();
                           },
-                          data: (data){
+                          data: (data) {
                             return _FavoriteIcon(isFavorite: data.value);
                           },
                         ),
@@ -118,14 +121,9 @@ class _FavoriteIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Icon(
-      isFavorite
-          ? Icons.favorite
-          : Icons.favorite_border,
-    );
+    return Icon(isFavorite ? Icons.favorite : Icons.favorite_border);
   }
 }
-
 
 // Виджет управления количеством в корзине
 class _CartControls extends ConsumerWidget {

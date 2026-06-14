@@ -3,22 +3,22 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'favorite_repository_impl.g.dart';
 
-final class FavoriteRepositoryImpl implements FavoriteRepository{
+final class FavoriteRepositoryImpl implements FavoriteRepository {
   const FavoriteRepositoryImpl();
 
   @override
-  Future<List<String>> getFavoritesProduct() async{
+  Future<List<String>> getFavoritesProduct() async {
     await Future.delayed(Duration(seconds: 1));
-    return ['1' , '2'];
+    return ['1', '2'];
   }
 
   @override
-  Future<void> addToFavorite(String id) async{
+  Future<void> addToFavorite(String id) async {
     await Future.delayed(Duration(seconds: 1));
   }
 
   @override
-  Future<void> removeToFavorite(String id) async{
+  Future<void> removeToFavorite(String id) async {
     await Future.delayed(Duration(seconds: 1));
   }
 }

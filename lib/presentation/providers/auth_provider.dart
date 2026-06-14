@@ -4,10 +4,7 @@ part 'auth_provider.g.dart';
 
 // Состояние авторизации пользователя
 class AuthState {
-  const AuthState({
-    required this.isLoggedIn,
-    this.username,
-  });
+  const AuthState({required this.isLoggedIn, this.username});
 
   final bool isLoggedIn;
   final String? username;

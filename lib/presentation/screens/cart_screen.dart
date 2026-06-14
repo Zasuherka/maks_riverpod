@@ -34,19 +34,16 @@ class _CartScreenState extends ConsumerState<CartScreen> {
     //
     // ВАЖНО: в Riverpod 3.x ref.listen() можно вызывать ТОЛЬКО внутри build().
     // Riverpod сам следит за жизненным циклом и отписывается при dispose.
-    ref.listen<int>(
-      cartItemCountProvider,
-      (previousCount, newCount) {
-        if (previousCount != null && newCount < previousCount) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Товар удалён из корзины'),
-              duration: Duration(seconds: 1),
-            ),
-          );
-        }
-      },
-    );
+    ref.listen<int>(cartItemCountProvider, (previousCount, newCount) {
+      if (previousCount != null && newCount < previousCount) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Товар удалён из корзины'),
+            duration: Duration(seconds: 1),
+          ),
+        );
+      }
+    });
 
     return Scaffold(
       appBar: AppBar(
@@ -67,7 +64,11 @@ class _CartScreenState extends ConsumerState<CartScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.shopping_cart_outlined, size: 64, color: Colors.grey),
+                  Icon(
+                    Icons.shopping_cart_outlined,
+                    size: 64,
+                    color: Colors.grey,
+                  ),
                   SizedBox(height: 16),
                   Text('Корзина пуста', style: TextStyle(color: Colors.grey)),
                 ],
@@ -129,11 +130,11 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                         ),
                         Text(
                           '${total.toStringAsFixed(0)} ₽',
-                          style:
-                              Theme.of(context).textTheme.titleLarge?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                    color: Theme.of(context).colorScheme.primary,
-                                  ),
+                          style: Theme.of(context).textTheme.titleLarge
+                              ?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
                         ),
                       ],
                     ),
@@ -156,7 +157,9 @@ class _CartScreenState extends ConsumerState<CartScreen> {
   }
 
   void _placeOrder(BuildContext context) {
-    final orderId = DateTime.now().millisecondsSinceEpoch.toString().substring(7);
+    final orderId = DateTime.now().millisecondsSinceEpoch.toString().substring(
+      7,
+    );
     ref.read(activeOrderIdProvider.notifier).setOrderId(orderId);
 
     // ==========================================================================

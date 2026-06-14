@@ -87,17 +87,13 @@ Widget buildTestAppWithCart(Cart Function() cartFactory) {
 // Это чище мока: не нужен mockito, просто подкласс с другим начальным состоянием.
 class _CartWithProduct extends Cart {
   @override
-  List<CartItem> build() => [
-        CartItem(product: _testProduct, quantity: 2),
-      ];
+  List<CartItem> build() => [CartItem(product: _testProduct, quantity: 2)];
 }
 
 // Cart с quantity = 1 — нужен для теста "уменьшение до нуля удаляет товар"
 class _CartWithQuantityOne extends Cart {
   @override
-  List<CartItem> build() => [
-        CartItem(product: _testProduct, quantity: 1),
-      ];
+  List<CartItem> build() => [CartItem(product: _testProduct, quantity: 1)];
 }
 
 // =============================================================================
@@ -136,128 +132,117 @@ void main() {
       expect(find.text('🥛'), findsOneWidget);
     });
 
-    testWidgets(
-      'показывает кнопку "В корзину" когда товара нет в корзине',
-      (WidgetTester tester) async {
-        // Никаких overrides — корзина пустая по умолчанию
-        await tester.pumpWidget(buildTestApp());
+    testWidgets('показывает кнопку "В корзину" когда товара нет в корзине', (
+      WidgetTester tester,
+    ) async {
+      // Никаких overrides — корзина пустая по умолчанию
+      await tester.pumpWidget(buildTestApp());
 
-        // findsOneWidget — гарантируем что кнопка есть и она одна
-        expect(find.text('В корзину'), findsOneWidget);
+      // findsOneWidget — гарантируем что кнопка есть и она одна
+      expect(find.text('В корзину'), findsOneWidget);
 
-        // findsNothing — убеждаемся что контролов +/- нет
-        expect(find.byIcon(Icons.add_circle_outline), findsNothing);
-        expect(find.byIcon(Icons.remove_circle_outline), findsNothing);
-      },
-    );
+      // findsNothing — убеждаемся что контролов +/- нет
+      expect(find.byIcon(Icons.add_circle_outline), findsNothing);
+      expect(find.byIcon(Icons.remove_circle_outline), findsNothing);
+    });
 
-    testWidgets(
-      'нажатие "В корзину" добавляет товар (кнопка исчезает)',
-      (WidgetTester tester) async {
-        await tester.pumpWidget(buildTestApp());
+    testWidgets('нажатие "В корзину" добавляет товар (кнопка исчезает)', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(buildTestApp());
 
-        // Убеждаемся что кнопка есть до нажатия
-        expect(find.text('В корзину'), findsOneWidget);
+      // Убеждаемся что кнопка есть до нажатия
+      expect(find.text('В корзину'), findsOneWidget);
 
-        // tap() — симулирует нажатие на виджет
-        await tester.tap(find.text('В корзину'));
+      // tap() — симулирует нажатие на виджет
+      await tester.tap(find.text('В корзину'));
 
-        // pump() — обрабатывает одно "событие" и перерисовывает дерево.
-        // ОБЯЗАТЕЛЬНО вызывать после tap/enterText/любого действия меняющего state!
-        // Без pump() виджет не перерисуется и тест увидит старое состояние.
-        await tester.pump();
+      // pump() — обрабатывает одно "событие" и перерисовывает дерево.
+      // ОБЯЗАТЕЛЬНО вызывать после tap/enterText/любого действия меняющего state!
+      // Без pump() виджет не перерисуется и тест увидит старое состояние.
+      await tester.pump();
 
-        // После добавления кнопка "В корзину" должна исчезнуть
-        expect(find.text('В корзину'), findsNothing);
-      },
-    );
+      // После добавления кнопка "В корзину" должна исчезнуть
+      expect(find.text('В корзину'), findsNothing);
+    });
 
-    testWidgets(
-      'нажатие "В корзину" показывает контролы количества',
-      (WidgetTester tester) async {
-        await tester.pumpWidget(buildTestApp());
+    testWidgets('нажатие "В корзину" показывает контролы количества', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(buildTestApp());
 
-        await tester.tap(find.text('В корзину'));
-        await tester.pump();
+      await tester.tap(find.text('В корзину'));
+      await tester.pump();
 
-        // После добавления должны появиться кнопки +/-
-        expect(find.byIcon(Icons.add_circle_outline), findsOneWidget);
-        expect(find.byIcon(Icons.remove_circle_outline), findsOneWidget);
+      // После добавления должны появиться кнопки +/-
+      expect(find.byIcon(Icons.add_circle_outline), findsOneWidget);
+      expect(find.byIcon(Icons.remove_circle_outline), findsOneWidget);
 
-        // Количество должно показываться как '1'
-        expect(find.text('1'), findsOneWidget);
-      },
-    );
+      // Количество должно показываться как '1'
+      expect(find.text('1'), findsOneWidget);
+    });
 
-    testWidgets(
-      'показывает контролы количества когда товар уже в корзине',
-      (WidgetTester tester) async {
-        // Используем хелпер с кастомным Cart.
-        // _CartWithProduct.build() возвращает корзину с 2 молоками.
-        // Так мы тестируем состояние "товар уже в корзине" без нажатия кнопок.
-        await tester.pumpWidget(buildTestAppWithCart(_CartWithProduct.new));
+    testWidgets('показывает контролы количества когда товар уже в корзине', (
+      WidgetTester tester,
+    ) async {
+      // Используем хелпер с кастомным Cart.
+      // _CartWithProduct.build() возвращает корзину с 2 молоками.
+      // Так мы тестируем состояние "товар уже в корзине" без нажатия кнопок.
+      await tester.pumpWidget(buildTestAppWithCart(_CartWithProduct.new));
 
-        // Кнопки управления должны быть видны (товар уже в корзине)
-        expect(find.byIcon(Icons.add_circle_outline), findsOneWidget);
-        expect(find.byIcon(Icons.remove_circle_outline), findsOneWidget);
+      // Кнопки управления должны быть видны (товар уже в корзине)
+      expect(find.byIcon(Icons.add_circle_outline), findsOneWidget);
+      expect(find.byIcon(Icons.remove_circle_outline), findsOneWidget);
 
-        // Количество должно быть '2' (из _CartWithProduct.build())
-        expect(find.text('2'), findsOneWidget);
+      // Количество должно быть '2' (из _CartWithProduct.build())
+      expect(find.text('2'), findsOneWidget);
 
-        // Кнопки "В корзину" быть не должно
-        expect(find.text('В корзину'), findsNothing);
-      },
-    );
+      // Кнопки "В корзину" быть не должно
+      expect(find.text('В корзину'), findsNothing);
+    });
 
-    testWidgets(
-      'кнопка + увеличивает количество',
-      (WidgetTester tester) async {
-        await tester.pumpWidget(buildTestAppWithCart(_CartWithProduct.new));
+    testWidgets('кнопка + увеличивает количество', (WidgetTester tester) async {
+      await tester.pumpWidget(buildTestAppWithCart(_CartWithProduct.new));
 
-        // Сначала quantity = 2 (из _CartWithProduct)
-        expect(find.text('2'), findsOneWidget);
+      // Сначала quantity = 2 (из _CartWithProduct)
+      expect(find.text('2'), findsOneWidget);
 
-        // Нажимаем кнопку "+"
-        await tester.tap(find.byIcon(Icons.add_circle_outline));
-        await tester.pump();
+      // Нажимаем кнопку "+"
+      await tester.tap(find.byIcon(Icons.add_circle_outline));
+      await tester.pump();
 
-        // Количество должно стать 3
-        expect(find.text('3'), findsOneWidget);
-      },
-    );
+      // Количество должно стать 3
+      expect(find.text('3'), findsOneWidget);
+    });
 
-    testWidgets(
-      'кнопка - уменьшает количество',
-      (WidgetTester tester) async {
-        await tester.pumpWidget(buildTestAppWithCart(_CartWithProduct.new));
+    testWidgets('кнопка - уменьшает количество', (WidgetTester tester) async {
+      await tester.pumpWidget(buildTestAppWithCart(_CartWithProduct.new));
 
-        // Нажимаем кнопку "-"
-        await tester.tap(find.byIcon(Icons.remove_circle_outline));
-        await tester.pump();
+      // Нажимаем кнопку "-"
+      await tester.tap(find.byIcon(Icons.remove_circle_outline));
+      await tester.pump();
 
-        // quantity было 2, стало 1
-        expect(find.text('1'), findsOneWidget);
-      },
-    );
+      // quantity было 2, стало 1
+      expect(find.text('1'), findsOneWidget);
+    });
 
-    testWidgets(
-      'нажатие - при quantity=1 возвращает кнопку "В корзину"',
-      (WidgetTester tester) async {
-        // Стартуем с quantity = 1
-        await tester.pumpWidget(buildTestAppWithCart(_CartWithQuantityOne.new));
+    testWidgets('нажатие - при quantity=1 возвращает кнопку "В корзину"', (
+      WidgetTester tester,
+    ) async {
+      // Стартуем с quantity = 1
+      await tester.pumpWidget(buildTestAppWithCart(_CartWithQuantityOne.new));
 
-        // Убеждаемся что контролы видны
-        expect(find.byIcon(Icons.remove_circle_outline), findsOneWidget);
+      // Убеждаемся что контролы видны
+      expect(find.byIcon(Icons.remove_circle_outline), findsOneWidget);
 
-        // Нажимаем "-" при quantity = 1 → товар должен удалиться из корзины
-        await tester.tap(find.byIcon(Icons.remove_circle_outline));
-        await tester.pump();
+      // Нажимаем "-" при quantity = 1 → товар должен удалиться из корзины
+      await tester.tap(find.byIcon(Icons.remove_circle_outline));
+      await tester.pump();
 
-        // После удаления должна снова появиться кнопка "В корзину"
-        expect(find.text('В корзину'), findsOneWidget);
-        expect(find.byIcon(Icons.remove_circle_outline), findsNothing);
-      },
-    );
+      // После удаления должна снова появиться кнопка "В корзину"
+      expect(find.text('В корзину'), findsOneWidget);
+      expect(find.byIcon(Icons.remove_circle_outline), findsNothing);
+    });
   });
 
   // =========================================================================
@@ -276,16 +261,15 @@ void main() {
       expect(find.byType(Text), findsWidgets);
     });
 
-    testWidgets('find.widgetWithText находит контейнер с нужным текстом', (tester) async {
+    testWidgets('find.widgetWithText находит контейнер с нужным текстом', (
+      tester,
+    ) async {
       await tester.pumpWidget(buildTestApp());
 
       // find.widgetWithText(WidgetType, 'text') — найти виджет типа X,
       // который СОДЕРЖИТ внутри себя Text с заданной строкой.
       // Полезно когда один и тот же тип виджета встречается несколько раз.
-      expect(
-        find.widgetWithText(FilledButton, 'В корзину'),
-        findsOneWidget,
-      );
+      expect(find.widgetWithText(FilledButton, 'В корзину'), findsOneWidget);
     });
   });
 }

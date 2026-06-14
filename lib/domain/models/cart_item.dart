@@ -1,10 +1,7 @@
 import 'package:maks_riverpod/domain/models/product.dart';
 
 class CartItem {
-  const CartItem({
-    required this.product,
-    required this.quantity,
-  });
+  const CartItem({required this.product, required this.quantity});
 
   final Product product;
   final int quantity;

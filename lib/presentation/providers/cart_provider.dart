@@ -24,8 +24,9 @@ class Cart extends _$Cart {
 
   // Добавить товар в корзину (или увеличить количество если уже есть)
   void addProduct(Product product) {
-    final existingIndex =
-        state.indexWhere((item) => item.product.id == product.id);
+    final existingIndex = state.indexWhere(
+      (item) => item.product.id == product.id,
+    );
 
     if (existingIndex >= 0) {
       // Riverpod требует ИММУТАБЕЛЬНОГО обновления state.

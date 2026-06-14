@@ -20,7 +20,11 @@ class LoginScreen extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const Icon(Icons.lock_outline, size: 64, color: Colors.deepOrange),
+              const Icon(
+                Icons.lock_outline,
+                size: 64,
+                color: Colors.deepOrange,
+              ),
               const SizedBox(height: 24),
               Text(
                 'Войдите в аккаунт',
@@ -31,8 +35,8 @@ class LoginScreen extends ConsumerWidget {
               Text(
                 'Гвард go_router перенаправил вас сюда',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.outline,
-                    ),
+                  color: Theme.of(context).colorScheme.outline,
+                ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 40),
