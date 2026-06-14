@@ -10,6 +10,7 @@ class ProfileScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final auth = ref.watch(authProvider);
+    print('object');
 
     return Scaffold(
       appBar: AppBar(title: const Text('Профиль')),
